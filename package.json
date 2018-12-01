@@ -1,0 +1,19 @@
+{
+  "name": "PoweredUpTrain",
+  "version": "0.1.0",
+  "description": "Test code for LEGO Powered Up",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsunsch/PoweredUpTrain.git"
+  },
+  "author": "Jan Bonde Schultz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jsunsch/PoweredUpTrain/issues"
+  },
+  "homepage": "https://github.com/jsunsch/PoweredUpTrain#readme"
+}
