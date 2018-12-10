@@ -1,17 +1,106 @@
 const PoweredUP = require("node-poweredup");
 const poweredUP = new PoweredUP.PoweredUP();
 
-poweredUP.on("discover", async (hub) => { // Wait to discover a Hub
-    await hub.connect(); // Connect to the Hub
-    await hub.sleep(3000); // Sleep for 3 seconds before starting
+const yellowTrainUUID = "90842b082fca";
+const switcherUUID = "90842b06f6c0";
+const chrissyTrainUUID = "90842b071d0a";
+const yellowSpeed = 45;
 
-    while (true) { // Repeat indefinitely
-//        hub.setMotorSpeed("B", -50); // Start a motor attached to port B to run a 3/4 speed (75) indefinitely
-        await hub.setMotorSpeed("A", 100,  2000); // Run a motor attached to port A for 2 seconds at maximum speed (100) then stop
-        await hub.sleep(1000); // Do nothing for 1 second
-        await hub.setMotorSpeed("A", -50,  1000); // Run a motor attached to port A for 1 second at 1/2 speed in reverse (-50) then stop
-        await hub.sleep(1000); // Do nothing for 1 second
-    }
+var yellowTrain = null;
+var switcher = null;
+var chrissyTrain = null;
+
+console.log("This code should run only once");
+
+poweredUP.on("discover", async (hub) => { // Wait to discover a Hub
+	console.log("On Discover: " + hub.uuid);
+
+	if(hub.uuid == switcherUUID)
+	{
+		console.log("Found switcher");
+		await hub.connect();
+		switcher = Object.assign({},hub);
+
+/*		await switcher.setMotorSpeed("A", -100);
+		await switcher.sleep(600);
+
+		await switcher.setMotorSpeed("A", 100);
+		await switcher.sleep(600);
+
+		await switcher.setMotorSpeed("A", 0);*/
+	}
+	else if(hub.uuid == yellowTrainUUID)
+	{
+		console.log("Yellow Train!");
+		hub.connect().then( async (hub1) => {
+			yellowTrain = hub1;
+console.log(hub1);
+
+/*
+		await yellowTrain.setMotorSpeed("A", yellowSpeed);
+
+		yellowTrain.on("color", async (port, color) => {
+			//console.log(color);
+
+			if(color == 9)
+			{
+				await yellowTrain.setMotorSpeed("A", 0);
+
+				if(switcher)
+				{
+					await switcher.setMotorSpeed("A", -100);
+					await switcher.sleep(600);
+
+					await switcher.setMotorSpeed("A", 100);
+					await switcher.sleep(600);
+
+					await switcher.setMotorSpeed("A", 0);
+				}
+				else
+				{
+					console.log("switcher not set");
+				}
+
+				await yellowTrain.sleep(3000);
+				await yellowTrain.setMotorSpeed("A", yellowSpeed);
+			}
+      		});
+*/
+		});
+	}
+	else if(hub.uuid == chrissyTrainUUID)
+	{
+		console.log("Weeee, Christmas Train has been activated");
+		await hub.connect();
+		chrissyTrain = Object.assign({},hub);
+
+/*		await chrissyTrain.setMotorSpeed("A", -25);
+		await chrissyTrain.sleep(1000);
+		await chrissyTrain.setMotorSpeed("A", 25);
+		await chrissyTrain.sleep(1000);
+		await chrissyTrain.setMotorSpeed("A", 0);*/
+	}
+	else
+	{
+		console.log("Unknown hub: " + hub.uuid);
+	}
+
+	//poweredUP.scan(); // Start scanning for hubs
 });
 
 poweredUP.scan(); // Start scanning for Hubs
+
+setInterval(() => {
+
+	let hubs = poweredUP.getConnectedHubs(); // Get an array of all connected hubs
+	hubs.forEach((hub) => {
+		console.log("Here's a hub: " + hub.uuid);
+	});
+
+	yellowTrain ? console.log("Yellow!") : console.log("No Yellow");
+
+	switcher ? console.log("Switcher!") : console.log("No switcher"+switcher);
+
+	chrissyTrain ? console.log("Santa's HERE!") : console.log("No santa :(");
+
+}, 2000);

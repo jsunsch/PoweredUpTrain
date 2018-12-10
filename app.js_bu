@@ -1,0 +1,50 @@
+const PoweredUP = require("node-poweredup");
+const poweredUP = new PoweredUP.PoweredUP();
+
+const yellowTrainUUID = "90842b082fca";
+const switcherUUID = "90842b06f6c0";
+let yellowTrain = null;
+let swither = null;
+
+poweredUP.on("discover", async (hub) => { // Wait to discover a Hub
+	console.log(hub.uuid);
+
+	if(hub.uuid == switcherUUID){
+		await hub.connect();
+		switcher = hub;
+	}
+
+	if(hub.uuid == yellowTrainUUID){
+		await hub.connect();
+		yellowTrain = hub;
+
+		yellowTrain.setMotorSpeed("A",35 );
+
+		yellowTrain.on("color", async (port, color) => {
+			//console.log(color);
+
+			if(color == 9)
+			{
+				yellowTrain.setMotorSpeed("A", 0);
+
+				if(switcher)
+				{
+					switcher.setMotorSpeed("A", 100);
+					await switcher.sleep(600);
+
+					switcher.setMotorSpeed("A", -100);
+					await switcher.sleep(600);
+				}
+				else
+				{
+					console.log("switcher not set");
+				}
+
+				await yellowTrain.sleep(3000);
+				yellowTrain.setMotorSpeed("A", 35);
+			}
+		});
+	}
+});
+
+poweredUP.scan(); // Start scanning for Hubs
